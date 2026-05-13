@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mudanzas Millas Express</title>
+
+  <!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║         MUDANZAS MILLAS EXPRESS — Versión Premium       ║
+  ║                                                         ║
+  ║  Efectos especiales:                                    ║
+  ║   · Fondo con partículas animadas (canvas)              ║
+  ║   · Texto con efecto de escritura automática            ║
+  ║   · Tarjetas con efecto de vidrio (glassmorphism)       ║
+  ║   · Paralax suave en el hero                            ║
+  ║   · Animaciones de entrada al hacer scroll              ║
+  ╚══════════════════════════════════════════════════════════╝
+  -->
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+
+    /* ════════════════════════════════
+       VARIABLES GLOBALES DE COLOR
+    ════════════════════════════════ */
+    :root {
+      --azul:        #1a3fcc;
+      --azul-oscuro: #060d3a;
+      --azul-medio:  #0e2490;
+      --azul-neon:   #4d7aff;
+      --azul-suave:  rgba(77,122,255,.12);
+      --blanco:      #ffffff;
+      --gris:        #f0f3ff;
+      --texto:       #1a1f36;
+      --acento:      #f0b429;
+      --acento2:     #ff6b35;
+      --vidrio:      rgba(255,255,255,.06);
+      --borde:       rgba(255,255,255,.12);
+    }
+
+    /* ════════════════════════════════
+       RESET Y BASE
+    ════════════════════════════════ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      color: var(--texto);
+      background: var(--azul-oscuro);
+      overflow-x: hidden;
+    }
+
+    /* ════════════════════════════════
+       BARRA DE PROGRESO SUPERIOR
+    ════════════════════════════════ */
+    #barra {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--azul-neon), var(--acento), var(--acento2));
+      z-index: 300;
+      transition: width .08s linear;
+      box-shadow: 0 0 10px var(--acento);  /* Brillo neón */
+    }
+
+    /* ════════════════════════════════
+       NAVEGACIÓN
+    ════════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6%;
+      height: 70px;
+      background: rgba(6, 13, 58, 0.7);   /* Fondo semi-transparente */
+      backdrop-filter: blur(20px);          /* Efecto cristal */
+      border-bottom: 1px solid var(--borde);
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      color: var(--blanco);
+      letter-spacing: 3px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Punto dorado animado junto al logo */
+    .logo::before {
+      content: '';
+      width: 8px; height: 8px;
+      background: var(--acento);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--acento);
+      animation: parpadeo 2s ease-in-out infinite;
+    }
+
+    @keyframes parpadeo {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .4; transform: scale(.6); }
+    }
+
+    .logo span { color: var(--acento); }
+
+    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+
+    .nav-links a {
+      color: rgba(255,255,255,.7);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: .85rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      transition: color .2s;
+      position: relative;
+    }
+
+    /* Subrayado que desliza de izquierda a derecha */
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--acento);
+      box-shadow: 0 0 6px var(--acento);
+      transition: width .3s;
+    }
+
+    .nav-links a:hover { color: var(--blanco); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* ════════════════════════════════
+       HERO CON CANVAS DE PARTÍCULAS
+       El canvas se dibuja con JavaScript
+    ════════════════════════════════ */
+    #inicio {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 6% 80px;
+      overflow: hidden;
+      /* Gradiente base sobre el que se dibujan las partículas */
+      background: radial-gradient(ellipse at 50% 50%, #0e2490 0%, var(--azul-oscuro) 70%);
+    }
+
+    /* Canvas de partículas — ocupa todo el hero */
+    #canvas-particulas {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+    }
+
+    /* Brillo central suave detrás del texto */
+    #inicio::after {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(26,63,204,.3) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    /* El contenido del hero va encima del canvas */
+    .hero-contenido {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+    }
+
+    /* Badge tipo chip */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: rgba(240,180,41,.1);
+      border: 1px solid rgba(240,180,41,.3);
+      color: var(--acento);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: .45rem 1.3rem;
+      border-radius: 50px;
+      margin-bottom: 1.5rem;
+      animation: entrar .8s ease both;
+    }
+
+    /* Punto parpadeante dentro del badge */
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: var(--acento);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--acento);
+      animation: parpadeo 1.5s infinite;
+    }
+
+    /* Título enorme con gradiente de color */
+    .hero-titulo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 11vw, 8rem);
+      line-height: .9;
+      letter-spacing: 4px;
+      margin-bottom: 1rem;
+      animation: entrar .8s .1s ease both;
+      /* Texto con gradiente */
+      background: linear-gradient(135deg, #ffffff 0%, #c8d4ff 50%, var(--acento) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Línea de texto con efecto de escritura automática */
+    .hero-typing {
+      font-size: clamp(1rem, 2.5vw, 1.35rem);
+      color: rgba(255,255,255,.7);
+      font-weight: 700;
+      margin-bottom: 2.5rem;
+      height: 2rem;
+      animation: entrar .8s .2s ease both;
+    }
+
+    /* Cursor parpadeante al final del texto */
+    .cursor {
+      display: inline-block;
+      width: 2px; height: 1.2em;
+      background: var(--acento);
+      margin-left: 3px;
+      vertical-align: middle;
+      animation: parpadeo .8s infinite;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: entrar .8s .3s ease both;
+    }
+
+    /* ════════════════════════════════
+       BOTONES
+    ════════════════════════════════ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .85rem 1.8rem;
+      border-radius: 50px;
+      font-weight: 800;
+      font-size: .92rem;
+      text-decoration: none;
+      letter-spacing: .5px;
+      transition: transform .2s, box-shadow .2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Destello de luz al pasar el mouse */
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 50%; height: 100%;
+      background: rgba(255,255,255,.25);
+      transform: skewX(-25deg);
+      transition: left .5s;
+    }
+
+    .btn:hover::before { left: 160%; }
+    .btn:hover { transform: translateY(-4px); }
+
+    .btn-wa   { background: linear-gradient(135deg, #25D366, #128C7E); color: #fff; box-shadow: 0 4px 20px rgba(37,211,102,.3); }
+    .btn-ig   { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #bc1888); color: #fff; box-shadow: 0 4px 20px rgba(220,39,67,.3); }
+    .btn-mail { background: linear-gradient(135deg, var(--azul-neon), var(--azul)); color: #fff; box-shadow: 0 4px 20px rgba(77,122,255,.3); }
+    .btn-wa:hover   { box-shadow: 0 8px 30px rgba(37,211,102,.5); }
+    .btn-ig:hover   { box-shadow: 0 8px 30px rgba(220,39,67,.5); }
+    .btn-mail:hover { box-shadow: 0 8px 30px rgba(77,122,255,.5); }
+
+    /* ════════════════════════════════
+       ANIMACIÓN DE ENTRADA
+    ════════════════════════════════ */
+    @keyframes entrar {
+      from { opacity: 0; transform: translateY(25px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Clase que JavaScript agrega cuando un elemento entra en pantalla */
+    .aparecer {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+
+    .aparecer.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ════════════════════════════════
+       OLA DIVISORIA
+    ════════════════════════════════ */
+    .ola { display: block; overflow: hidden; line-height: 0; }
+    .ola svg { display: block; }
+
+    /* ════════════════════════════════
+       SECCIONES GENERALES
+    ════════════════════════════════ */
+    section { padding: 100px 6%; }
+
+    .sec-titulo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 3.8rem);
+      letter-spacing: 2px;
+      line-height: 1;
+      margin-bottom: .4rem;
+    }
+
+    .sec-titulo.claro { color: var(--blanco); }
+    .sec-titulo.oscuro { color: var(--azul-oscuro); }
+
+    /* Decoración de líneas bajo el título */
+    .deco {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .deco span { display: block; height: 3px; border-radius: 3px; }
+    .deco .d1 { width: 50px; background: var(--acento); box-shadow: 0 0 8px var(--acento); }
+    .deco .d2 { width: 20px; background: var(--acento2); }
+    .deco .d3 { width: 8px;  background: var(--azul-neon); }
+
+    /* ════════════════════════════════
+       QUIÉNES SOMOS
+       Fondo oscuro con efecto de vidrio
+    ════════════════════════════════ */
+    #quienes {
+      background: linear-gradient(160deg, #070e40 0%, #0a1560 50%, #060d3a 100%);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Círculo decorativo de fondo */
+    #quienes::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(77,122,255,.08) 0%, transparent 70%);
+      right: -100px; top: -100px;
+    }
+
+    .quienes-texto p {
+      font-size: 1rem;
+      line-height: 1.9;
+      color: rgba(255,255,255,.7);
+      margin-bottom: 1rem;
+    }
+
+    /* Valores con efecto vidrio */
+    .valores { list-style: none; margin-top: 1.8rem; display: flex; flex-direction: column; gap: .8rem; }
+
+    .valores li {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      font-weight: 700;
+      font-size: .92rem;
+      color: rgba(255,255,255,.85);
+      background: var(--vidrio);         /* Fondo de vidrio */
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: .7rem 1rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .valores li::before {
+      content: '✓';
+      width: 24px; height: 24px;
+      background: var(--acento);
+      color: var(--azul-oscuro);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    /* Camión SVG animado */
+    .quienes-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Anillo de luz giratorio detrás del camión */
+    .quienes-visual::before {
+      content: '';
+      position: absolute;
+      width: 340px; height: 340px;
+      border-radius: 50%;
+      border: 1px solid rgba(77,122,255,.2);
+      animation: girar 12s linear infinite;
+    }
+
+    .quienes-visual::after {
+      content: '';
+      position: absolute;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(26,63,204,.15) 0%, transparent 70%);
+    }
+
+    @keyframes girar {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    @keyframes flotar {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-16px); }
+    }
+
+    .camion-svg {
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      z-index: 1;
+      animation: flotar 4s ease-in-out infinite;
+      filter: drop-shadow(0 20px 40px rgba(77,122,255,.4));
+    }
+
+    /* ════════════════════════════════
+       SERVICIOS
+       Tarjetas con efecto glassmorphism
+       (vidrio esmerilado)
+    ════════════════════════════════ */
+    #servicios {
+      background: var(--gris);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Gradiente decorativo de fondo */
+    #servicios::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(26,63,204,.06) 0%, transparent 70%);
+      top: -200px; right: -100px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    /* Tarjeta individual */
+    .card {
+      background: var(--blanco);
+      border-radius: 24px;
+      padding: 2.2rem 1.8rem;
+      text-align: center;
+      border: 1.5px solid rgba(26,63,204,.08);
+      box-shadow: 0 4px 20px rgba(26,63,204,.05);
+      transition: transform .3s, box-shadow .3s, border-color .3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Gradiente que aparece en hover */
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(26,63,204,.04), rgba(77,122,255,.04));
+      opacity: 0;
+      transition: opacity .3s;
+    }
+
+    /* Barra superior de acento */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--azul), var(--azul-neon), var(--acento));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s;
+    }
+
+    .card:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(26,63,204,.15); border-color: rgba(26,63,204,.2); }
+    .card:hover::before { transform: scaleX(1); }
+    .card:hover::after  { opacity: 1; }
+
+    .card-icon {
+      width: 72px; height: 72px;
+      margin: 0 auto 1.2rem;
+      background: linear-gradient(135deg, var(--azul-suave), rgba(77,122,255,.08));
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+      transition: transform .3s, background .3s;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card:hover .card-icon { transform: scale(1.15) rotate(-8deg); background: linear-gradient(135deg, var(--azul), var(--azul-neon)); }
+
+    .card h3 { font-size: 1.05rem; font-weight: 900; color: var(--azul-oscuro); margin-bottom: .5rem; position: relative; z-index: 1; }
+    .card p  { font-size: .88rem; color: #667; line-height: 1.7; position: relative; z-index: 1; }
+
+    /* ════════════════════════════════
+       EXPERIENCIA
+       Fondo oscuro con patrón de rejilla
+    ════════════════════════════════ */
+    #experiencia {
+      background: var(--azul-oscuro);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Patrón de rejilla en el fondo */
+    #experiencia::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(77,122,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(77,122,255,.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+    }
+
+    /* Brillo central */
+    #experiencia::after {
+      content: '';
+      position: absolute;
+      width: 700px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(26,63,204,.2) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .exp-texto {
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: rgba(255,255,255,.65);
+      max-width: 650px;
+      margin-bottom: 3.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Tarjeta de estadística con efecto vidrio */
+    .stat-card {
+      background: var(--vidrio);
+      border: 1px solid var(--borde);
+      border-radius: 24px;
+      padding: 2.2rem 1.5rem;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      transition: transform .3s, background .3s, box-shadow .3s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-8px);
+      background: rgba(255,255,255,.1);
+      box-shadow: 0 15px 40px rgba(0,0,0,.3);
+    }
+
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem;
+      line-height: 1;
+      letter-spacing: 1px;
+      /* Número con gradiente dorado */
+      background: linear-gradient(135deg, var(--acento), var(--acento2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: .88rem;
+      color: rgba(255,255,255,.65);
+      margin-top: .6rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+    }
+
+    /* ════════════════════════════════
+       CONTACTO
+    ════════════════════════════════ */
+    #contacto {
+      background: linear-gradient(160deg, #070e40 0%, #0a1560 100%);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Patrón de puntos */
+    #contacto::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 25px 25px;
+    }
+
+    #contacto .sec-titulo { text-align: center; }
+    #contacto .deco { justify-content: center; }
+
+    .contacto-desc {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,.6);
+      margin-bottom: 3.5rem;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .contacto-cards {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Tarjeta de contacto con vidrio */
+    .c-card {
+      background: var(--vidrio);
+      border: 1px solid var(--borde);
+      border-radius: 24px;
+      padding: 2.2rem 2rem;
+      width: 220px;
+      backdrop-filter: blur(16px);
+      transition: transform .3s, background .3s, border-color .3s, box-shadow .3s;
+    }
+
+    .c-card:hover { transform: translateY(-8px); background: rgba(255,255,255,.1); }
+    .c-card.wa:hover   { border-color: rgba(37,211,102,.4);   box-shadow: 0 15px 40px rgba(37,211,102,.15); }
+    .c-card.ig:hover   { border-color: rgba(220,39,67,.4);    box-shadow: 0 15px 40px rgba(220,39,67,.15); }
+    .c-card.mail:hover { border-color: rgba(77,122,255,.4);   box-shadow: 0 15px 40px rgba(77,122,255,.15); }
+
+    .c-card-icon { font-size: 2.8rem; margin-bottom: 1rem; }
+
+    .c-card h4 {
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,.4);
+      margin-bottom: .4rem;
+    }
+
+    .c-card p {
+      font-weight: 800;
+      font-size: .95rem;
+      color: var(--blanco);
+      margin-bottom: 1.2rem;
+    }
+
+    .btn-grande { padding: .8rem 1.8rem; font-size: .88rem; border-radius: 50px; }
+
+    /* ════════════════════════════════
+       FOOTER
+    ════════════════════════════════ */
+    footer {
+      background: #030820;
+      padding: 3rem 6% 2rem;
+      border-top: 1px solid var(--borde);
+    }
+
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 2.5rem;
+      padding-bottom: 2rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.7rem;
+      color: var(--blanco);
+      letter-spacing: 3px;
+      margin-bottom: .8rem;
+    }
+
+    .footer-logo span { color: var(--acento); }
+
+    .footer-marca p { font-size: .85rem; color: rgba(255,255,255,.4); line-height: 1.8; max-width: 280px; }
+
+    .footer-col h5 {
+      color: rgba(255,255,255,.5);
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 1.2rem;
+    }
+
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: .6rem; }
+    .footer-col a  { color: rgba(255,255,255,.4); text-decoration: none; font-size: .88rem; transition: color .2s; }
+    .footer-col a:hover { color: var(--acento); }
+
+    .social-row { display: flex; gap: .8rem; }
+
+    .soc {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--borde);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem;
+      text-decoration: none;
+      transition: background .2s, transform .2s, border-color .2s;
+    }
+
+    .soc:hover { background: var(--vidrio); transform: translateY(-3px); border-color: rgba(255,255,255,.25); }
+
+    .footer-copy {
+      text-align: center;
+      font-size: .8rem;
+      color: rgba(255,255,255,.25);
+      letter-spacing: .5px;
+    }
+
+    .footer-copy strong { color: var(--acento); }
+
+    /* ════════════════════════════════
+       BOTÓN FLOTANTE WHATSAPP
+    ════════════════════════════════ */
+    .wa-flotante {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      z-index: 999;
+      width: 60px; height: 60px;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.9rem;
+      text-decoration: none;
+      box-shadow: 0 5px 25px rgba(37,211,102,.5), 0 0 0 0 rgba(37,211,102,.4);
+      animation: onda 2.5s infinite;
+    }
+
+    /* Animación de onda expansiva */
+    @keyframes onda {
+      0%   { box-shadow: 0 5px 25px rgba(37,211,102,.5), 0 0 0 0 rgba(37,211,102,.4); }
+      70%  { box-shadow: 0 5px 25px rgba(37,211,102,.5), 0 0 0 18px rgba(37,211,102,0); }
+      100% { box-shadow: 0 5px 25px rgba(37,211,102,.5), 0 0 0 0 rgba(37,211,102,0); }
+    }
+
+    .wa-flotante:hover { transform: scale(1.12); }
+
+    /* ════════════════════════════════
+       GALERÍA DE FOTOS
+       Muestra las fotos reales del negocio
+       con efecto de zoom al pasar el mouse
+    ════════════════════════════════ */
+    #galeria {
+      background: var(--gris);
+      padding: 100px 6%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decoración de fondo */
+    #galeria::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(26,63,204,.05) 0%, transparent 70%);
+      bottom: -150px; left: -100px;
+    }
+
+    #galeria .sec-titulo { text-align: center; }
+    #galeria .deco       { justify-content: center; }
+
+    .galeria-sub {
+      text-align: center;
+      color: #667;
+      font-size: 1rem;
+      margin-bottom: 3rem;
+      font-weight: 600;
+    }
+
+    /* Grid de 3 columnas para las fotos */
+    .galeria-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Contenedor de cada foto */
+    .galeria-item {
+      border-radius: 20px;
+      overflow: hidden;       /* El zoom no se sale del borde */
+      position: relative;
+      aspect-ratio: 3/4;      /* Proporción vertical como las fotos originales */
+      box-shadow: 0 8px 30px rgba(26,63,204,.1);
+      cursor: pointer;
+    }
+
+    /* Imagen dentro del contenedor */
+    .galeria-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;        /* Rellena sin deformar */
+      object-position: center;
+      transition: transform .5s ease; /* Animación de zoom suave */
+      display: block;
+    }
+
+    /* Zoom al pasar el mouse */
+    .galeria-item:hover img { transform: scale(1.08); }
+
+    /* Capa oscura con texto que aparece al hover */
+    .galeria-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(6,13,58,.85) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity .4s ease;
+      display: flex;
+      align-items: flex-end;
+      padding: 1.5rem;
+    }
+
+    .galeria-item:hover .galeria-overlay { opacity: 1; }
+
+    .galeria-overlay p {
+      color: var(--blanco);
+      font-weight: 800;
+      font-size: .95rem;
+      line-height: 1.4;
+    }
+
+    .galeria-overlay span {
+      display: block;
+      color: var(--acento);
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: .3rem;
+    }
+
+    /* ════════════════════════════════
+       RESPONSIVE — celular
+    ════════════════════════════════ */
+    @media (max-width: 768px) {
+      #quienes { grid-template-columns: 1fr; gap: 3rem; }
+      .quienes-visual { display: none; }
+      .nav-links { display: none; }
+      .footer-top { flex-direction: column; }
+      /* En celular las fotos van en 1 columna */
+      .galeria-grid { grid-template-columns: 1fr; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Barra de progreso de scroll -->
+  <div id="barra"></div>
+
+  <!-- ══════════════════════════════
+       NAVEGACIÓN
+  ══════════════════════════════ -->
+  <nav>
+    <a class="logo" href="#inicio">
+      Millas <span>Express</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#quienes">Quiénes Somos</a></li>
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#experiencia">Experiencia</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+  </nav>
+
+  <!-- ══════════════════════════════
+       HERO con partículas animadas
+       El canvas se llena con JavaScript
+  ══════════════════════════════ -->
+  <section id="inicio">
+    <canvas id="canvas-particulas"></canvas>
+
+    <div class="hero-contenido">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Panamá · Servicio Profesional
+      </div>
+
+      <h1 class="hero-titulo">
+        Mudanzas<br>Millas Express
+      </h1>
+
+      <!-- El texto cambia automáticamente con JavaScript -->
+      <div class="hero-typing">
+        <span id="texto-dinamico"></span><span class="cursor"></span>
+      </div>
+
+      <!-- Botones de contacto -->
+      <div class="hero-btns">
+        <!-- WhatsApp: 507 = código de Panamá + número sin guiones -->
+        <a class="btn btn-wa"   href="https://wa.me/50763091887" target="_blank">💬 WhatsApp</a>
+        <a class="btn btn-ig"   href="https://www.instagram.com/mudanzasmillasexpress?igsh=cHBrZzFmeTk2eXNr" target="_blank">📸 Instagram</a>
+        <!-- CAMBIA "tucorreo@gmail.com" por tu correo real -->
+        <a class="btn btn-mail" href="mailto:tucorreo@gmail.com">✉️ Correo</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ola divisoria -->
+  <div class="ola">
+    <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#070e40" d="M0,30 C360,70 1080,-10 1440,30 L1440,60 L0,60 Z"/>
+    </svg>
+  </div>
+
+  <!-- ══════════════════════════════
+       QUIÉNES SOMOS
+  ══════════════════════════════ -->
+  <section id="quienes">
+
+    <div class="quienes-texto aparecer">
+      <h2 class="sec-titulo claro">Quiénes<br>Somos</h2>
+      <div class="deco"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+
+      <p>Somos <strong style="color:#fff">Mudanzas Millas Express</strong>, una empresa panameña con el corazón puesto en cada mudanza. Nacimos con la misión de convertir uno de los momentos más estresantes de la vida en una experiencia tranquila.</p>
+
+      <p>Entendemos que tus pertenencias no son solo objetos — son recuerdos, son tu historia. Por eso cada traslado lo tratamos con el mismo cuidado que le daríamos a las nuestras. 💙</p>
+
+      <ul class="valores">
+        <li>Puntualidad garantizada en cada servicio</li>
+        <li>Personal capacitado y de confianza</li>
+        <li>Equipos adecuados para todo tipo de mudanza</li>
+        <li>Precios justos y totalmente transparentes</li>
+        <li>Atención personalizada desde el primer contacto</li>
+      </ul>
+    </div>
+
+    <!-- Camión vectorial animado -->
+    <div class="quienes-visual aparecer">
+      <svg class="camion-svg" viewBox="0 0 420 240" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="70" width="280" height="130" rx="10" fill="#0e2490"/>
+        <rect x="14" y="78" width="262" height="114" rx="8" fill="#1a3fcc"/>
+        <text x="145" y="128" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="18" fill="white" letter-spacing="2">MUDANZAS</text>
+        <text x="145" y="155" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="21" fill="#f0b429" letter-spacing="2">MILLAS EXPRESS</text>
+        <rect x="14" y="78"  width="262" height="5" rx="2" fill="#f0b429" opacity=".8"/>
+        <rect x="14" y="186" width="262" height="5" rx="2" fill="#f0b429" opacity=".8"/>
+        <rect x="285" y="110" width="128" height="90" rx="10" fill="#060d3a"/>
+        <rect x="293" y="118" width="112" height="52" rx="6" fill="#4d7aff" opacity=".7"/>
+        <rect x="296" y="121" width="50" height="46" rx="4" fill="#3a5ee8" opacity=".6"/>
+        <rect x="351" y="121" width="51" height="46" rx="4" fill="#3a5ee8" opacity=".6"/>
+        <rect x="403" y="152" width="12" height="10" rx="3" fill="#f0b429"/>
+        <rect x="5"   y="152" width="9"  height="14" rx="2" fill="#ff4444"/>
+        <circle cx="65"  cy="206" r="28" fill="#060d3a"/>
+        <circle cx="65"  cy="206" r="17" fill="#333"/>
+        <circle cx="65"  cy="206" r="7"  fill="#666"/>
+        <circle cx="215" cy="206" r="28" fill="#060d3a"/>
+        <circle cx="215" cy="206" r="17" fill="#333"/>
+        <circle cx="215" cy="206" r="7"  fill="#666"/>
+        <circle cx="355" cy="206" r="28" fill="#060d3a"/>
+        <circle cx="355" cy="206" r="17" fill="#333"/>
+        <circle cx="355" cy="206" r="7"  fill="#666"/>
+        <rect x="5" y="195" width="408" height="14" rx="4" fill="#060d3a"/>
+        <rect x="60"  y="28" width="42" height="42" rx="6" fill="#f0b429" transform="rotate(-8,81,49)"/>
+        <rect x="132" y="18" width="52" height="52" rx="6" fill="#ff6b35" transform="rotate(5,158,44)"/>
+        <rect x="212" y="26" width="40" height="40" rx="6" fill="#4d7aff" transform="rotate(-4,232,46)"/>
+        <text x="81"  y="54" text-anchor="middle" font-size="20" transform="rotate(-8,81,49)">📦</text>
+        <text x="158" y="52" text-anchor="middle" font-size="24" transform="rotate(5,158,44)">📦</text>
+        <text x="232" y="51" text-anchor="middle" font-size="18" transform="rotate(-4,232,46)">📦</text>
+      </svg>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════
+       SERVICIOS
+  ══════════════════════════════ -->
+  <section id="servicios">
+    <h2 class="sec-titulo oscuro aparecer">Lo Que<br>Ofrecemos</h2>
+    <div class="deco aparecer"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+
+    <div class="cards-grid">
+      <div class="card aparecer">
+        <div class="card-icon">🏠</div>
+        <h3>Mudanzas Residenciales</h3>
+        <p>Trasladamos todos tus muebles y pertenencias con el máximo cuidado y eficiencia.</p>
+      </div>
+      <div class="card aparecer">
+        <div class="card-icon">🏢</div>
+        <h3>Mudanzas de Oficina</h3>
+        <p>Movemos tu empresa rápido y organizado, minimizando el tiempo fuera de operación.</p>
+      </div>
+      <div class="card aparecer">
+        <div class="card-icon">📦</div>
+        <h3>Embalaje Profesional</h3>
+        <p>Empacamos con materiales de calidad para que todo llegue en perfecto estado.</p>
+      </div>
+      <div class="card aparecer">
+        <div class="card-icon">🚚</div>
+        <h3>Transporte de Carga</h3>
+        <p>Vehículos adecuados para objetos grandes, pesados o de difícil manejo.</p>
+      </div>
+      <div class="card aparecer">
+        <div class="card-icon">⚡</div>
+        <h3>Servicio Express</h3>
+        <p>¿Urgencia de último momento? Disponibilidad para mudanzas rápidas cuando más lo necesitas.</p>
+      </div>
+      <div class="card aparecer">
+        <div class="card-icon">💰</div>
+        <h3>Cotización Gratis</h3>
+        <p>Presupuesto sin compromiso. Precios justos y transparentes, sin sorpresas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ola divisoria -->
+  <div class="ola" style="background:#f0f3ff">
+    <svg viewBox="0 0 1440 55" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#060d3a" d="M0,20 C360,55 1080,-5 1440,20 L1440,55 L0,55 Z"/>
+    </svg>
+  </div>
+
+  <!-- ══════════════════════════════
+       EXPERIENCIA
+       Los números se animan al entrar en pantalla
+  ══════════════════════════════ -->
+  <section id="experiencia">
+    <h2 class="sec-titulo claro aparecer">Nuestra<br>Experiencia</h2>
+    <div class="deco aparecer"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+
+    <p class="exp-texto aparecer">
+      Llevamos años siendo el aliado de confianza de familias y empresas en Panamá.
+      Cada mudanza nos ha enseñado algo nuevo. Hoy somos el servicio que las personas
+      recomiendan a sus seres queridos — y eso vale más que cualquier número. 🙌
+    </p>
+
+    <!-- Modifica los números según la realidad de tu negocio -->
+    <div class="stats-grid">
+      <div class="stat-card aparecer">
+        <div class="stat-num" data-meta="500|+">0+</div>
+        <div class="stat-label">Mudanzas Completadas</div>
+      </div>
+      <div class="stat-card aparecer">
+        <div class="stat-num" data-meta="100|%">0%</div>
+        <div class="stat-label">Clientes Satisfechos</div>
+      </div>
+      <div class="stat-card aparecer">
+        <div class="stat-num">5 ★</div>
+        <div class="stat-label">Calificación Promedio</div>
+      </div>
+      <div class="stat-card aparecer">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">Disponibilidad</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ola divisoria: de azul oscuro a gris claro (fondo de la galería) -->
+  <div class="ola" style="background:#060d3a">
+    <svg viewBox="0 0 1440 55" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#f0f3ff" d="M0,25 C480,60 960,-5 1440,25 L1440,55 L0,55 Z"/>
+    </svg>
+  </div>
+
+  <!-- ══════════════════════════════
+       GALERÍA DE FOTOS REALES
+       Las imágenes deben estar en la carpeta "imagenes/"
+       junto al archivo index.html
+
+       INSTRUCCIONES:
+       1. Crea una carpeta llamada "imagenes" en la misma
+          carpeta donde está el index.html
+       2. Guarda tus 3 fotos con estos nombres exactos:
+          · foto1.jpg  (persona embalando el piano)
+          · foto2.jpg  (camión en la calle)
+          · foto3.jpg  (camión en edificio La Costa)
+       3. ¡Listo! Las fotos aparecerán automáticamente
+  ══════════════════════════════ -->
+  <section id="galeria">
+    <h2 class="sec-titulo oscuro aparecer">Nuestro<br>Trabajo Real</h2>
+    <div class="deco aparecer"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+    <p class="galeria-sub aparecer">Esto es lo que hacemos — sin filtros, sin mentiras 💪</p>
+
+    <div class="galeria-grid">
+
+      <!-- FOTO 1 — Persona embalando piano -->
+      <div class="galeria-item aparecer">
+        <img src="imagenes/foto1.jpg" alt="Embalaje profesional de piano" loading="lazy" />
+        <div class="galeria-overlay">
+          <div>
+            <span>Embalaje Profesional</span>
+            <p>Un piano profesional en manos de profesionales</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOTO 2 — Camión en la calle con el equipo -->
+      <div class="galeria-item aparecer">
+        <img src="imagenes/foto2.jpg" alt="Equipo de mudanzas en operación" loading="lazy" />
+        <div class="galeria-overlay">
+          <div>
+            <span>Equipo en Acción</span>
+            <p>Nuestro equipo listo para cada mudanza</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOTO 3 — Camión en edificio La Costa -->
+      <div class="galeria-item aparecer">
+        <img src="imagenes/foto3.jpg" alt="Mudanza en edificio residencial" loading="lazy" />
+        <div class="galeria-overlay">
+          <div>
+            <span>Mudanzas Residenciales</span>
+            <p>Llegamos a los mejores edificios de Panamá</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Ola divisoria: de gris claro a azul oscuro (fondo de Contacto) -->
+  <div class="ola" style="background:#f0f3ff">
+    <svg viewBox="0 0 1440 55" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#070e40" d="M0,25 C480,60 960,-5 1440,25 L1440,55 L0,55 Z"/>
+    </svg>
+  </div>
+
+  <!-- ══════════════════════════════
+       CONTACTO
+  ══════════════════════════════ -->
+  <section id="contacto">
+    <h2 class="sec-titulo claro aparecer">¡Hablemos!</h2>
+    <div class="deco aparecer"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+
+    <p class="contacto-desc aparecer">
+      Escríbenos por el canal que prefieras.<br>
+      ¡Respondemos rápido! 🚀
+    </p>
+
+    <div class="contacto-cards">
+
+      <!-- WhatsApp -->
+      <div class="c-card wa aparecer">
+        <div class="c-card-icon">💬</div>
+        <h4>WhatsApp</h4>
+        <p>6309-1887</p>
+        <a class="btn btn-wa btn-grande" href="https://wa.me/50763091887" target="_blank">Escribir</a>
+      </div>
+
+      <!-- Instagram -->
+      <div class="c-card ig aparecer">
+        <div class="c-card-icon">📸</div>
+        <h4>Instagram</h4>
+        <p>@millasexpress</p>
+        <a class="btn btn-ig btn-grande" href="https://www.instagram.com/mudanzasmillasexpress?igsh=cHBrZzFmeTk2eXNr" target="_blank">Seguir</a>
+      </div>
+
+      <!--
+        CORREO — cambia "tucorreo@gmail.com" por tu correo real
+        El href="mailto:..." abre la app de correo del usuario
+      -->
+      <div class="c-card mail aparecer">
+        <div class="c-card-icon">✉️</div>
+        <h4>Correo</h4>
+        <p>tucorreo@gmail.com</p>
+        <a class="btn btn-mail btn-grande" href="mailto:tucorreo@gmail.com">Enviar</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       FOOTER
+  ══════════════════════════════ -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-marca">
+        <div class="footer-logo">🚚 Millas <span>Express</span></div>
+        <p>Tu empresa de confianza para mudanzas en Panamá. Comprometidos con tu tranquilidad desde el primer llamado hasta la última caja.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Ir a</h5>
+        <ul>
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#quienes">Quiénes Somos</a></li>
+          <li><a href="#servicios">Servicios</a></li>
+          <li><a href="#experiencia">Experiencia</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Contáctanos</h5>
+        <ul>
+          <li><a href="https://wa.me/50763091887">💬 6309-1887</a></li>
+          <!-- Cambia el correo aquí también -->
+          <li><a href="mailto:tucorreo@gmail.com">✉️ tucorreo@gmail.com</a></li>
+          <li><a href="https://www.instagram.com/mudanzasmillasexpress?igsh=cHBrZzFmeTk2eXNr">📸 @millasexpress</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Síguenos</h5>
+        <div class="social-row">
+          <a class="soc" href="https://wa.me/50763091887" target="_blank">💬</a>
+          <a class="soc" href="https://www.instagram.com/mudanzasmillasexpress?igsh=cHBrZzFmeTk2eXNr" target="_blank">📸</a>
+          <a class="soc" href="mailto:tucorreo@gmail.com">✉️</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copy">
+      © 2025 <strong>Mudanzas Millas Express</strong> · Todos los derechos reservados · Panamá 🇵🇦
+    </div>
+  </footer>
+
+  <!-- Botón flotante de WhatsApp con animación de onda -->
+  <a class="wa-flotante" href="https://wa.me/50763091887" target="_blank" title="Escríbenos">💬</a>
+
+  <!-- ══════════════════════════════
+       JAVASCRIPT
+       1. Partículas en el fondo del hero
+       2. Texto que cambia automáticamente
+       3. Animaciones al hacer scroll
+       4. Contadores animados
+       5. Barra de progreso
+  ══════════════════════════════ -->
+  <script>
+
+    /* ── 1. PARTÍCULAS ──────────────────────────────────────
+       Dibuja puntos que flotan y se conectan con líneas
+       cuando están cerca unos de otros
+    ──────────────────────────────────────────────────────── */
+    const canvas = document.getElementById('canvas-particulas');
+    const ctx    = canvas.getContext('2d'); // Contexto 2D para dibujar
+
+    // Ajusta el tamaño del canvas al tamaño de la pantalla
+    function ajustarCanvas() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    ajustarCanvas();
+    window.addEventListener('resize', ajustarCanvas);
+
+    // Crea partículas con posición, velocidad y tamaño aleatorios
+    const particulas = Array.from({ length: 70 }, () => ({
+      x:  Math.random() * canvas.width,
+      y:  Math.random() * canvas.height,
+      vx: (Math.random() - .5) * .6,   // Velocidad horizontal (-0.3 a 0.3)
+      vy: (Math.random() - .5) * .6,   // Velocidad vertical
+      r:  Math.random() * 2 + 1         // Radio entre 1 y 3
+    }));
+
+    // Función que se llama 60 veces por segundo para animar
+    function animarParticulas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpia el canvas
+
+      particulas.forEach(p => {
+        // Mueve cada partícula según su velocidad
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Si sale del borde, reaparece del otro lado
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
+        // Dibuja el punto
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(100, 140, 255, 0.5)';
+        ctx.fill();
+      });
+
+      // Dibuja líneas entre partículas cercanas
+      for (let i = 0; i < particulas.length; i++) {
+        for (let j = i + 1; j < particulas.length; j++) {
+          const dx   = particulas[i].x - particulas[j].x;
+          const dy   = particulas[i].y - particulas[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy); // Distancia entre dos puntos
+
+          if (dist < 130) { // Solo conecta si están a menos de 130px
+            const opacidad = (1 - dist / 130) * 0.4; // Más cerca = más visible
+            ctx.beginPath();
+            ctx.moveTo(particulas[i].x, particulas[i].y);
+            ctx.lineTo(particulas[j].x, particulas[j].y);
+            ctx.strokeStyle = `rgba(77, 122, 255, ${opacidad})`;
+            ctx.lineWidth = .5;
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(animarParticulas); // Llama esta función en el siguiente frame
+    }
+
+    animarParticulas(); // Inicia la animación
+
+
+    /* ── 2. TEXTO CON EFECTO DE ESCRITURA ──────────────────
+       Escribe y borra frases automáticamente
+    ──────────────────────────────────────────────────────── */
+    const frases = [
+      'Tu mudanza, nuestra misión ✦',
+      'Rápido · Seguro · Confiable',
+      'Cuidamos cada objeto como si fuera nuestro 💙',
+      'Llámanos y te cotizamos gratis 📞'
+    ];
+
+    let iFrase   = 0;  // Índice de la frase actual
+    let iLetra   = 0;  // Posición dentro de la frase
+    let borrando = false; // Si está borrando o escribiendo
+
+    function escribir() {
+      const el    = document.getElementById('texto-dinamico');
+      const frase = frases[iFrase];
+
+      if (!borrando) {
+        // Agrega una letra
+        iLetra++;
+        el.textContent = frase.substring(0, iLetra);
+
+        if (iLetra === frase.length) {
+          // Terminó de escribir — pausa antes de borrar
+          borrando = true;
+          setTimeout(escribir, 2000); // Espera 2 segundos
+          return;
+        }
+      } else {
+        // Quita una letra
+        iLetra--;
+        el.textContent = frase.substring(0, iLetra);
+
+        if (iLetra === 0) {
+          // Terminó de borrar — pasa a la siguiente frase
+          borrando = false;
+          iFrase   = (iFrase + 1) % frases.length;
+        }
+      }
+
+      setTimeout(escribir, borrando ? 40 : 65); // Borrar es más rápido
+    }
+
+    escribir(); // Inicia el efecto
+
+
+    /* ── 3. ANIMACIONES AL HACER SCROLL ────────────────────
+       Los elementos con clase "aparecer" se muestran
+       cuando entran en el área visible de la pantalla
+    ──────────────────────────────────────────────────────── */
+    const obsScroll = new IntersectionObserver((entradas) => {
+      entradas.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible'); // Agrega clase que activa la animación CSS
+        }
+      });
+    }, { threshold: 0.15 });
+
+    // Aplica el observador a todos los elementos con clase "aparecer"
+    document.querySelectorAll('.aparecer').forEach(el => obsScroll.observe(el));
+
+
+    /* ── 4. CONTADORES ANIMADOS ─────────────────────────────
+       Los números cuentan desde 0 al entrar en pantalla
+       El atributo data-meta="NUMERO|SUFIJO" define el valor
+    ──────────────────────────────────────────────────────── */
+    const obsStats = new IntersectionObserver((entradas) => {
+      entradas.forEach(entrada => {
+        if (!entrada.isIntersecting) return;
+        const el   = entrada.target;
+        const meta = el.dataset.meta;
+        if (!meta) return;
+
+        const [valorStr, sufijo] = meta.split('|'); // Separa "500" y "+"
+        const valorFinal = parseInt(valorStr);
+        let actual = 0;
+
+        const intervalo = setInterval(() => {
+          actual += Math.ceil(valorFinal / 60); // Divide en 60 pasos
+          if (actual >= valorFinal) {
+            el.textContent = valorFinal + sufijo;
+            clearInterval(intervalo);
+          } else {
+            el.textContent = actual + sufijo;
+          }
+        }, 20);
+
+        obsStats.unobserve(el); // Solo anima una vez
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('[data-meta]').forEach(el => obsStats.observe(el));
+
+
+    /* ── 5. BARRA DE PROGRESO ───────────────────────────────
+       Se llena conforme el usuario hace scroll
+    ──────────────────────────────────────────────────────── */
+    window.addEventListener('scroll', () => {
+      const total    = document.body.scrollHeight - window.innerHeight;
+      const progreso = (window.scrollY / total) * 100;
+      document.getElementById('barra').style.width = progreso + '%';
+    });
+
+  </script>
+
+</body>
+</html>
