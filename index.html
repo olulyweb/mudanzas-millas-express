@@ -397,36 +397,111 @@
 
 <div class="ola" style="background:#060d3a"><svg viewBox="0 0 1440 55" xmlns="http://www.w3.org/2000/svg"><path fill="#f0f3ff" d="M0,25 C480,60 960,-5 1440,25 L1440,55 L0,55 Z"/></svg></div>
 
+ Para incluir las **8 imágenes** que enviaste y mantener la estética impecable de tu diseño, he adaptado la estructura de la galería.
+
+La he organizado en tres bloques que fluyen de forma muy profesional en la cuadrícula (`grid`):
+
+* **Fila 1:** 2 fotos anchas de gran impacto visual (mostrando los imponentes apartamentos y el embalaje general).
+* **Fila 2:** 3 fotos detalladas (la flota de camiones, el piano y el inventario ordenado).
+* **Fila 3:** 3 fotos detalladas de procesos (el embalaje individual, el trabajo en equipo con film protector y la logística del espacio).
+
+He redactado títulos y descripciones altamente profesionales, enfocados en transmitir confianza, seguridad y excelencia operativa. Aquí tienes tu código listo para copiar y pegar:
+
+```html
 <!-- GALERÍA -->
 <section id="galeria">
   <h2 class="sec-titulo oscuro aparecer">Nuestro<br>Trabajo Real</h2>
   <div class="deco aparecer" data-delay="1"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
   <p class="galeria-sub aparecer" data-delay="2">Esto es lo que hacemos — sin filtros 💪</p>
   <div class="galeria-grid">
-    <!-- Fila 1: 2 fotos anchas -->
+    
+    <!-- Fila 1: 2 fotos anchas (Gran Impacto) -->
     <div class="galeria-item aparecer-escala" data-delay="1">
-      <img src="rapido_y_seguro.jpeg" alt="Equipo Millas Express en acción" loading="lazy" />
-      <div class="galeria-overlay"><div><span>Rápido y Seguro</span><p>Nuestro equipo en cada detalle de tu mudanza</p></div></div>
+      <img src="WhatsApp Image 2026-07-15 at 11.21.39 AM (2)_3.jpeg" alt="Equipo de mudanzas embalando sala residencial" loading="lazy" />
+      <div class="galeria-overlay">
+        <div>
+          <span>Embalaje Residencial Premium</span>
+          <p>Protección integral de mobiliario con materiales de alta resistencia.</p>
+        </div>
+      </div>
     </div>
+    
     <div class="galeria-item aparecer-escala" data-delay="2">
-      <img src="equipo_de_trabajo.jpeg" alt="Equipo de trabajo en Greenview Residences" loading="lazy" />
-      <div class="galeria-overlay"><div><span>Equipo Profesional</span><p>Llegamos a los mejores edificios de Panamá</p></div></div>
+      <img src="WhatsApp Image 2026-07-15 at 11.21.40 AM_3.jpeg" alt="Operario realizando embalaje técnico en apartamento de gran altura" loading="lazy" />
+      <div class="galeria-overlay">
+        <div>
+          <span>Mudanzas de Alta Gama</span>
+          <p>Servicio especializado para residencias y condominios exclusivos.</p>
+        </div>
+      </div>
     </div>
-    <!-- Fila 2: 3 fotos -->
+
+    <!-- Fila 2: 3 fotos (Detalle y Especialidades) -->
     <div class="galeria-item aparecer-escala" data-delay="3">
-      <img src="camion.png" alt="Camión Millas Express en LaCosta" loading="lazy" />
-      <div class="galeria-overlay"><div><span>Transporte de Carga</span><p>Vehículos listos para el trabajo pesado</p></div></div>
+      <img src="WhatsApp Image 2026-07-15 at 11.21.40 AM (1)_3.jpeg" alt="Camiones de carga de Millas Express listos para traslado" loading="lazy" />
+      <div class="galeria-overlay">
+        <div>
+          <span>Flota Logística Adaptable</span>
+          <p>Unidades equipadas para traslados seguros y de gran volumen.</p>
+        </div>
+      </div>
     </div>
+    
     <div class="galeria-item aparecer-escala" data-delay="4">
-      <img src="chuo.png" alt="Camión Millas Express cargando" loading="lazy" />
-      <div class="galeria-overlay"><div><span>Embalaje Profesional</span><p>Un piano profesional en manos de profesionales</p></div></div>
+      <img src="chuo_3.png" alt="Especialista protegiendo un piano de cola profesional" loading="lazy" />
+      <div class="galeria-overlay">
+        <div>
+          <span>Traslado de Objetos Delicados</span>
+          <p>Cuidado, embalaje y manipulación experta de pianos e instrumentos de alto valor.</p>
+        </div>
+      </div>
     </div>
+    
     <div class="galeria-item aparecer-escala" data-delay="5">
-      <img src="trabajo.png" alt="Embalaje profesional de piano" loading="lazy" />
-      <div class="galeria-overlay"><div><span>En Movimiento</span><p>Siempre puntuales, siempre eficientes</p></div></div>
+      <img src="WhatsApp Image 2026-07-15 at 11.21.38 AM_3.jpeg" alt="Cajas de mudanza rotuladas y ordenadas con carretilla de carga" loading="lazy" />
+      <div class="galeria-overlay">
+        <div>
+          <span>Organización y Clasificación</span>
+          <p>Inventario y rotulación sistemática para una descarga rápida y ordenada.</p>
+        </div>
+      </div>
     </div>
+
+    <!-- Fila 3: 3 fotos (Procesos y Logística de Espacio) -->
+    <div class="galeria-item aparecer-escala" data-delay="6">
+      <img src="WhatsApp Image 2026-07-15 at 11.21.39 AM (1)_3.jpeg" alt="Personal de mudanzas embalando sillería de comedor" loading="lazy" />
+      <div class="galeria-overlay">
+        <div>
+          <span>Protección Detallada</span>
+          <p>Embalaje individual pieza por pieza para asegurar el perfecto estado de sus bienes.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="galeria-item aparecer-escala" data-delay="7">
+      <img src="WhatsApp Image 2026-07-15 at 11.21.37 AM_3.jpeg" alt="Equipo técnico asegurando cajas con película estirable" loading="lazy" />
+      <div class="galeria-overlay">
+        <div>
+          <span>Técnicas de Embalaje Profesional</span>
+          <p>Uso de film estirable de alta densidad para la máxima seguridad durante el tránsito.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="galeria-item aparecer-escala" data-delay="8">
+      <img src="WhatsApp Image 2026-07-15 at 11.21.39 AM_3.jpeg" alt="Vista general de un proceso de mudanza en un condominio" loading="lazy" />
+      <div class="galeria-overlay">
+        <div>
+          <span>Coordinación de Espacios</span>
+          <p>Planificación logística en sitio para mudanzas eficientes y libres de estrés.</p>
+        </div>
+      </div>
+    </div>
+
   </div>
-</section> 
+</section>
+
+```
 
 <div class="ola" style="background:#f0f3ff"><svg viewBox="0 0 1440 55" xmlns="http://www.w3.org/2000/svg"><path fill="#070e40" d="M0,25 C480,60 960,-5 1440,25 L1440,55 L0,55 Z"/></svg></div>
 
